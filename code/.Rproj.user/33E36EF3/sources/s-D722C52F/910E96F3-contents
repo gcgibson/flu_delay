@@ -1,0 +1,5 @@
+data <- readRDS("flu_data_with_backfill.rds")
+
+fully_observed_data <- data %>% group_by(region,epiweek) %>%
+  filter(lag == max(lag))
+write.csv(fully_observed_data,"fully_observed_data")

@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1548723372436.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "B3731E10",
+    "lastKnownWriteTime" : 1548781008,
+    "last_content_update" : 1548781008729,
+    "path" : "~/reporting_delay_experiments/code/main.R",
+    "project_path" : "main.R",
+    "properties" : {
+        "cursorPosition" : "32,66",
+        "scrollLine" : "28",
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

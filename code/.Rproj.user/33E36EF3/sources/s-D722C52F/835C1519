@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1548768492479.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "835C1519",
+    "lastKnownWriteTime" : 1548781220,
+    "last_content_update" : 1548781220075,
+    "path" : "~/reporting_delay_experiments/code/eval_forecasts.R",
+    "project_path" : "eval_forecasts.R",
+    "properties" : {
+        "cursorPosition" : "7,18",
+        "scrollLine" : "0",
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
