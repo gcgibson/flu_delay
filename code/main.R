@@ -6,6 +6,13 @@ lag_df <- read.csv("lag_df")
 fully_observed_data <- read.csv("fully_observed_data")
 model_params <- read.csv("model_params.csv")
 
+##models
+source("model_1.R")
+source("model_2.R")
+source("truth_from_lag_df.R")
+source("truth.R")
+models_to_test <- c("M2")
+
 model_var <- model_params$model_variance
 data_for_training <- fully_observed_data[fully_observed_data$region ==test_region & fully_observed_data$epiweek < 201540,]
 arima_fit <- auto.arima(data_for_training$wili)
@@ -29,58 +36,27 @@ for (test_region in c("nat",paste0("hhs",1:10))){
         test_season_formatted <- test_season
         test_week_formatted <- test_week
       }
-      for (reporting_delay_adjustment in c(TRUE,FALSE,"TRUTH")){
+      for (reporting_delay_adjustment in models_to_test){
         current_observed_data_with_lags <- data[data$region == test_region & data$issue <= as.numeric(paste0(test_season_formatted,test_week_formatted)),]
         current_observed_data <- current_observed_data_with_lags %>% group_by(region,epiweek) %>%
           filter(lag == max(lag))
         current_observed_data <- current_observed_data[order(current_observed_data$epiweek),]
         
         if (reporting_delay_adjustment == "LAGDF"){
-          if (test_week_formatted >=40){
-            for (lag_itr in seq(40,test_week_formatted)){
-              current_lag <- test_week_formatted -lag_itr
-              current_observed_data[current_observed_data$epiweek == paste0(test_season_formatted,lag_itr),]$wili <-
-                current_observed_data[current_observed_data$epiweek == paste0(test_season_formatted,lag_itr),]$wili/lag_df[lag_df$Region == test_region & lag_df$week == paste0(test_season_formatted,lag_itr) , paste0("X",current_lag)]
-            }
-          } else{
-            for (lag_itr in seq(40,52)){
-              current_lag <- 52 -lag_itr
-              current_observed_data[current_observed_data$epiweek == paste0(test_season_formatted-1,lag_itr),]$wili <-
-                current_observed_data[current_observed_data$epiweek == paste0(test_season_formatted-1,lag_itr),]$wili/lag_df[lag_df$Region == test_region & lag_df$week == paste0(test_season_formatted-1,lag_itr) , paste0("X",current_lag)]
-            }
-            for (lag_itr in seq(1,as.numeric(test_week_formatted))){
-              current_lag <- as.numeric(test_week_formatted) -lag_itr
-              current_observed_data[current_observed_data$epiweek == paste0(test_season_formatted,lag_itr),]$wili <-
-                current_observed_data[current_observed_data$epiweek == paste0(test_season_formatted,lag_itr),]$wili/lag_df[lag_df$Region == test_region & lag_df$week == paste0(test_season_formatted,lag_itr) , paste0("X",current_lag)]
-            }
-          }
+          trajectory_samples <- run_model_truth_from_lag(test_week_formatted,test_season_formatted,test_region,current_observed_data)
+          
         } else if(reporting_delay_adjustment == "TRUTH"){
-          current_observed_data <- fully_observed_data[fully_observed_data$region == test_region & fully_observed_data$epiweek <=paste0(test_season_formatted,test_week_formatted),]
-        } else if(reporting_delay_adjustment == TRUE){
-          if (test_week_formatted >=40){
-            for (lag_itr in seq(40,test_week_formatted)){
-              current_lag <- test_week_formatted -lag_itr
-              prop_estimate <- mean(lag_df[lag_df$Region == test_region & lag_df$week < 201540 , paste0("X",current_lag)],na.rm = T)
-              current_observed_data[current_observed_data$epiweek == paste0(test_season_formatted,lag_itr),]$wili <-
-                current_observed_data[current_observed_data$epiweek == paste0(test_season_formatted,lag_itr),]$wili/prop_estimate
-            }
-          } else{
-            for (lag_itr in seq(40,52)){
-              current_lag <- 52 -lag_itr
-              current_observed_data[current_observed_data$epiweek == paste0(test_season_formatted-1,lag_itr),]$wili <-
-                current_observed_data[current_observed_data$epiweek == paste0(test_season_formatted-1,lag_itr),]$wili/lag_df[lag_df$Region == test_region & lag_df$week == paste0(test_season_formatted-1,lag_itr) , paste0("X",current_lag)]
-            }
-            for (lag_itr in seq(1,as.numeric(test_week_formatted))){
-              current_lag <- as.numeric(test_week_formatted) -lag_itr
-              current_observed_data[current_observed_data$epiweek == paste0(test_season_formatted,lag_itr),]$wili <-
-                current_observed_data[current_observed_data$epiweek == paste0(test_season_formatted,lag_itr),]$wili/lag_df[lag_df$Region == test_region & lag_df$week == paste0(test_season_formatted,lag_itr) , paste0("X",current_lag)]
-            }
-          }
+          trajectory_samples <- run_true_model()
+          
+        } else if(reporting_delay_adjustment == "M1"){
+          trajectory_samples <- run_model_1(test_week_formatted,test_season_formatted,test_region,current_observed_data)
+          
+        } else if(reporting_delay_adjustment == "M2"){
+          trajectory_samples <- run_model_2(test_week_formatted,test_season_formatted,test_region,current_observed_data)
+          
         }
         
-        arima_updated_fit <- Arima(current_observed_data$wili,model = arima_fit)
-        mean_forecast_trajectory <- forecast(arima_updated_fit,h=4)$mean
-        trajectory_samples <- matrix(rnorm(1000,mean_forecast_trajectory,model_var),ncol=4,byrow = T)
+        
         trajectory_samples_bins <- apply(trajectory_samples,1:2,get_inc_bin)
         trajectory_log_prob <- c()
         for (ph in 1:4){

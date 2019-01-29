@@ -53,5 +53,6 @@ for (region in unique(data$region)){
 lag_df <- as.data.frame(lag_df)
 lag_df <- lag_df[2:nrow(lag_df),]
 colnames(lag_df) <- c("Region","week",seq(0,51))
+lag_df$season_week <- unlist(lapply(lag_df$week,function(x) {return (substr(x,5,7))}))
 
 write.csv(lag_df,"lag_df")

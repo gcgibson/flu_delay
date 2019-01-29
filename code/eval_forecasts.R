@@ -109,7 +109,7 @@ for (test_region in c("nat",paste0("hhs",1:10)) ){
     }
   }
 }
-print (c(paste0("Score ",step_ahead, " step ahead"),score))
+print (c(paste0("Score ",step_ahead, " step ahead ", " Model Var:",model_var),score))
 print ("Delay Adjusted")
 print (log(geoMean(delay_adjusted_total_prob +.000000000000000000001)))
 print ("Non-delay Adjusted")
