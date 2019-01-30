@@ -17,7 +17,7 @@ run_model_2 <- function(test_week_formatted,test_season_formatted,test_region,cu
         current_observed_data_local[current_observed_data_local$epiweek == paste0(test_season_formatted,lag_itr),]$wili <-
           current_observed_data_local[current_observed_data_local$epiweek == paste0(test_season_formatted,lag_itr),]$wili/prop_estimate_sample
         }
-      arima_updated_fit <- Arima(current_observed_data$wili,model = arima_fit)
+      arima_updated_fit <- Arima(current_observed_data_local$wili,model = arima_fit)
       mean_forecast_trajectory <- forecast(arima_updated_fit,h=4)$mean
       trajectory_samples <- rbind(trajectory_samples,mean_forecast_trajectory)
     }
@@ -50,10 +50,12 @@ run_model_2 <- function(test_week_formatted,test_season_formatted,test_region,cu
         current_observed_data[current_observed_data$epiweek == paste0(test_season_formatted,lag_itr),]$wili <-
           current_observed_data[current_observed_data$epiweek == paste0(test_season_formatted,lag_itr),]$wili/prop_estimate_sample
       }
-      arima_updated_fit <- Arima(current_observed_data$wili,model = arima_fit)
+      arima_updated_fit <- Arima(current_observed_data_local$wili,model = arima_fit)
       mean_forecast_trajectory <- forecast(arima_updated_fit,h=4)$mean
       trajectory_samples <- rbind(trajectory_samples,mean_forecast_trajectory)
     }
   }
+  
+  trajectory_samples <- trajectory_samples[2:nrow(trajectory_samples),]
   return (trajectory_samples)
 }

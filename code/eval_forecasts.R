@@ -37,7 +37,7 @@ for (test_region in c("nat",paste0("hhs",1:10)) ){
         test_week_formatted <- test_week
       }
       
-      delay_adjusted_forecasts <- read.csv(paste0("output/",test_region,"-",test_season_formatted,"-",test_week_formatted,"-","TRUE","-",model_var))
+      delay_adjusted_forecasts <- read.csv(paste0("output/",test_region,"-",test_season_formatted,"-",test_week_formatted,"-","M2","-",model_var))
       non_delay_adjusted_forecasts <- read.csv(paste0("output/",test_region,"-",test_season_formatted,"-",test_week_formatted,"-","FALSE","-",model_var))
       true_forecasts <- read.csv(paste0("output/",test_region,"-",test_season_formatted,"-",test_week_formatted,"-","TRUTH","-",model_var))
       

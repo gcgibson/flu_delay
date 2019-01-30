@@ -5,7 +5,7 @@ data <- readRDS("flu_data_with_backfill.rds")
 lag_df <- read.csv("lag_df")
 fully_observed_data <- read.csv("fully_observed_data")
 model_params <- read.csv("model_params.csv")
-
+source("utils.R")
 ##models
 source("model_1.R")
 source("model_2.R")
@@ -14,10 +14,11 @@ source("truth.R")
 models_to_test <- c("M2")
 
 model_var <- model_params$model_variance
-data_for_training <- fully_observed_data[fully_observed_data$region ==test_region & fully_observed_data$epiweek < 201540,]
-arima_fit <- auto.arima(data_for_training$wili)
 
 for (test_region in c("nat",paste0("hhs",1:10))){
+  
+  data_for_training <- fully_observed_data[fully_observed_data$region ==test_region & fully_observed_data$epiweek < 201540,]
+  arima_fit <- auto.arima(data_for_training$wili)
   for (test_season in c("2015","2016","2017")){
     if (test_season == "2017"){
       end_week <- 12
