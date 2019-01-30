@@ -11,7 +11,7 @@ source("model_1.R")
 source("model_2.R")
 source("truth_from_lag_df.R")
 source("truth.R")
-models_to_test <- c("M2")
+models_to_test <- c("M1")
 
 model_var <- model_params$model_variance
 
@@ -25,7 +25,7 @@ for (test_region in c("nat",paste0("hhs",1:10))){
     }else{
       end_week <- 20
     }
-    for (test_week in c(seq(40,52),seq(end_week))){
+    for (test_week in c(seq(40,52),seq(20))){
       if (test_week < 40){
         test_season_formatted <- as.numeric(test_season) + 1
         if (test_week <= 9){
