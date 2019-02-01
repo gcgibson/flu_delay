@@ -1,5 +1,12 @@
 library(forecast)
 library(dplyr)
+library(foreach)
+
+
+
+
+
+
 ## Load needed objects
 data <- readRDS("flu_data_with_backfill.rds")
 lag_df <- read.csv("lag_df")
@@ -11,11 +18,12 @@ source("model_1.R")
 source("model_2.R")
 source("truth_from_lag_df.R")
 source("truth.R")
-models_to_test <- c("M1")
+models_to_test <- c("M2")
 
 model_var <- model_params$model_variance
 
-for (test_region in c("nat",paste0("hhs",1:10))){
+foreach (test_region=c(paste0("hhs",7:10))) %dopar%
+{
   
   data_for_training <- fully_observed_data[fully_observed_data$region ==test_region & fully_observed_data$epiweek < 201540,]
   arima_fit <- auto.arima(data_for_training$wili)
