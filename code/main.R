@@ -1,7 +1,7 @@
 library(forecast)
 library(dplyr)
 library(foreach)
-
+library(sarimaTD)
 
 
 
@@ -18,15 +18,21 @@ source("model_1.R")
 source("model_2.R")
 source("truth_from_lag_df.R")
 source("truth.R")
-models_to_test <- c("M2")
+models_to_test <- c("M1","NONE","M2","TRUTH")
 
 model_var <- model_params$model_variance
 
-foreach (test_region=c(paste0("hhs",7:10))) %dopar%
+foreach (test_region=c(paste0("hhs",1:10))) %dopar%
 {
   
   data_for_training <- fully_observed_data[fully_observed_data$region ==test_region & fully_observed_data$epiweek < 201540,]
-  arima_fit <- auto.arima(data_for_training$wili)
+  #arima_fit <- auto.arima(data_for_training$wili)
+  arima_fit <-  fit_sarima(
+    y = data_for_training$wili,
+    ts_frequency = 52,
+    transformation = "box-cox",
+    seasonal_difference = TRUE)
+  
   for (test_season in c("2015","2016","2017")){
     if (test_season == "2017"){
       end_week <- 12
@@ -63,6 +69,15 @@ foreach (test_region=c(paste0("hhs",7:10))) %dopar%
         } else if(reporting_delay_adjustment == "M2"){
           trajectory_samples <- run_model_2(test_week_formatted,test_season_formatted,test_region,current_observed_data)
           
+        } else if(reporting_delay_adjustment == "NONE"){
+          sampled_trajectories_bc_transform <-
+            simulate(
+              object = arima_fit,
+              nsim = 1000,
+              seed = 1,
+              newdata =current_observed_data$wili,
+              h = 52
+            )
         }
         
         

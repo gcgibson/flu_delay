@@ -19,8 +19,15 @@ run_model_2 <- function(test_week_formatted,test_season_formatted,test_region,cu
         current_observed_data_local[current_observed_data_local$epiweek == paste0(test_season_formatted,lag_itr),]$wili <-
           current_observed_data_local[current_observed_data_local$epiweek == paste0(test_season_formatted,lag_itr),]$wili/prop_estimate_sample
         }
-      arima_updated_fit <- Arima(current_observed_data_local$wili,model = arima_fit)
-      mean_forecast_trajectory <-simulate(arima_updated_fit,nsim=4,future = T)
+      #arima_updated_fit <- Arima(current_observed_data_local$wili,model = arima_fit)
+      mean_forecast_trajectory <-
+        simulate(
+          object = arima_fit,
+          nsim = 1000,
+          seed = 1,
+          newdata =current_observed_data$wili,
+          h = 52
+        )
       trajectory_samples <- rbind(trajectory_samples,mean_forecast_trajectory)
     }
   } else{
@@ -52,8 +59,15 @@ run_model_2 <- function(test_week_formatted,test_season_formatted,test_region,cu
         current_observed_data_local[current_observed_data_local$epiweek == paste0(test_season_formatted,lag_itr),]$wili <-
           current_observed_data_local[current_observed_data_local$epiweek == paste0(test_season_formatted,lag_itr),]$wili/prop_estimate_sample
       }
-      arima_updated_fit <- Arima(current_observed_data_local$wili,model = arima_fit)
-      mean_forecast_trajectory <- simulate(arima_updated_fit,nsim=4,future = T)
+      #arima_updated_fit <- Arima(current_observed_data_local$wili,model = arima_fit)
+      mean_forecast_trajectory <- 
+        simulate(
+          object = arima_fit,
+          nsim = 1000,
+          seed = 1,
+          newdata =current_observed_data$wili,
+          h = 52
+        )
       trajectory_samples <- rbind(trajectory_samples,mean_forecast_trajectory)
     }
   }
